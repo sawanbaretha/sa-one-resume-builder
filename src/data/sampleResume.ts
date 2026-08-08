@@ -2,22 +2,22 @@ import type { ResumeData, Customization } from '../types/resume';
 
 export const initialResumeData: ResumeData = {
   personalDetails: {
-    fullName: "Alexander Wright",
+    fullName: "Sawan Baretha",
     jobTitle: "Senior Full Stack Engineer",
-    email: "alexander.wright@devmail.io",
-    phone: "+1 (555) 234-5678",
-    location: "San Francisco, CA",
-    website: "https://alexwright.dev",
-    linkedin: "linkedin.com/in/alexwright-dev",
-    github: "github.com/alexwright",
-    summary: "Dynamic Senior Software Engineer with 6+ years of expertise in building high-scale modern web applications, cloud microservices, and slick user interfaces. Proven track record of spearheading cross-functional engineering teams, optimizing performance by 45%, and architecting scalable backend APIs."
+    email: "sawan@gmail.com",
+    phone: "+91 7617XXXXXX",
+    location: "Gwalior, MP",
+    website: "https://sawanbaretha.dev",
+    linkedin: "linkedin.com/in/sawanbaretha",
+    github: "github.com/sawanbaretha",
+    summary: "Dynamic Senior Software Engineer with expertise in building high-scale modern web applications, cloud microservices, and slick user interfaces. Proven track record of spearheading cross-functional engineering teams, optimizing performance, and architecting scalable backend APIs."
   },
   experiences: [
     {
       id: "exp-1",
       jobTitle: "Senior Full Stack Engineer",
       company: "Nexus Cloud Solutions",
-      location: "San Francisco, CA",
+      location: "Gwalior, MP",
       startDate: "2022-03",
       endDate: "Present",
       current: true,
@@ -27,7 +27,7 @@ export const initialResumeData: ResumeData = {
       id: "exp-2",
       jobTitle: "Software Engineer",
       company: "Apex Tech Labs",
-      location: "Austin, TX",
+      location: "India",
       startDate: "2019-06",
       endDate: "2022-02",
       current: false,
@@ -37,13 +37,13 @@ export const initialResumeData: ResumeData = {
   educations: [
     {
       id: "edu-1",
-      institution: "University of California, Berkeley",
-      degree: "Bachelor of Science",
+      institution: "Madhav Institute of Technology & Science",
+      degree: "Bachelor of Technology",
       fieldOfStudy: "Computer Science & Engineering",
       startDate: "2015-08",
       endDate: "2019-05",
-      location: "Berkeley, CA",
-      gpa: "3.85 / 4.0"
+      location: "Gwalior, MP",
+      gpa: "8.5 / 10"
     }
   ],
   skills: [
@@ -63,7 +63,7 @@ export const initialResumeData: ResumeData = {
       description: "An AI-powered live collaborative code editor featuring web containers, real-time sync, and intelligent code completions.",
       technologies: ["React", "TypeScript", "Node.js", "WebSockets", "TailwindCSS"],
       link: "https://pulseengine.dev",
-      githubLink: "github.com/alexwright/pulseengine"
+      githubLink: "github.com/sawanbaretha/pulseengine"
     },
     {
       id: "proj-2",
@@ -71,7 +71,7 @@ export const initialResumeData: ResumeData = {
       description: "Open-source monitoring analytics suite for Kubernetes clusters providing interactive metrics & alert routing.",
       technologies: ["Next.js", "Go", "Prometheus", "Chart.js"],
       link: "https://cloudmetrics.io",
-      githubLink: "github.com/alexwright/cloudmetrics"
+      githubLink: "github.com/sawanbaretha/cloudmetrics"
     }
   ],
   certifications: [
@@ -79,8 +79,8 @@ export const initialResumeData: ResumeData = {
     { id: "cert-2", name: "Meta Professional Full-Stack Software Developer", issuer: "Coursera / Meta", date: "2021" }
   ],
   languages: [
-    { id: "lang-1", name: "English", proficiency: "Native / Bilingual" },
-    { id: "lang-2", name: "Spanish", proficiency: "Professional Working" }
+    { id: "lang-1", name: "Hindi", proficiency: "Native / Bilingual" },
+    { id: "lang-2", name: "English", proficiency: "Professional Working" }
   ]
 };
 
