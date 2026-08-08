@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Download, RotateCcw, LogIn, LogOut, History as HistoryIcon } from 'lucide-react';
+import { Sparkles, Download, RotateCcw, LogIn, LogOut, History as HistoryIcon, Maximize2 } from 'lucide-react';
 import type { ResumeData } from '../types/resume';
 import { initialResumeData } from '../data/sampleResume';
 import type { User } from '@supabase/supabase-js';
@@ -13,6 +13,7 @@ interface NavbarProps {
   onSignOut: () => void;
   onOpenHistory: () => void;
   historyCount: number;
+  onOpenFullScreen: () => void;
   onDownloadPDF: () => void;
 }
 
@@ -23,9 +24,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSignOut,
   onOpenHistory,
   historyCount,
+  onOpenFullScreen,
   onDownloadPDF
 }) => {
-
   const handleLoadSample = () => {
     setResumeData(JSON.parse(JSON.stringify(initialResumeData)));
   };
@@ -64,19 +65,28 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           className="btn btn-accent btn-sm"
           onClick={handleLoadSample}
-          title="Fill with realistic sample data to test templates"
+          title="Fill with sample data"
         >
-          <Sparkles size={16} />
+          <Sparkles size={15} />
           <span>Load Sample</span>
         </button>
 
         <button
-          className="btn btn-danger btn-sm"
+          className="btn btn-secondary btn-sm"
           onClick={handleReset}
           title="Clear all fields"
         >
           <RotateCcw size={15} />
           <span>Reset</span>
+        </button>
+
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={onOpenFullScreen}
+          title="Full Screen Preview mode"
+        >
+          <Maximize2 size={15} />
+          <span>Full Preview</span>
         </button>
 
         {/* Supabase User & Auth Status */}
@@ -87,36 +97,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onOpenHistory}
               title="View History of saved resumes and PDFs"
             >
-              <HistoryIcon size={16} />
+              <HistoryIcon size={15} />
               <span>History</span>
               {historyCount > 0 && (
-                <span
-                  style={{
-                    backgroundColor: '#ffffff',
-                    color: '#0066ff',
-                    fontSize: '0.7rem',
-                    borderRadius: '10px',
-                    padding: '0.1rem 0.4rem',
-                    fontWeight: 800
-                  }}
-                >
+                <span className="navbar-history-badge">
                   {historyCount}
                 </span>
               )}
             </button>
 
-            <span
-              style={{
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: '#ffffff',
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                padding: '0.35rem 0.65rem',
-                borderRadius: '6px',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}
-              title={user.email}
-            >
+            <span className="navbar-user-email" title={user.email}>
               {user.email?.split('@')[0]}
             </span>
 
@@ -134,16 +124,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenAuth}
             title="Sign in with Supabase"
           >
-            <LogIn size={16} />
+            <LogIn size={15} />
             <span>Sign In</span>
           </button>
         )}
 
-        {/* Download PDF Button (Auto-saves to Supabase before downloading) */}
+        {/* Emerald Green Download PDF Button */}
         <button
-          className="btn btn-primary"
+          className="btn btn-emerald"
           onClick={onDownloadPDF}
-          title="Download clean PDF resume (Requires Auth)"
+          title="Download clean PDF resume"
         >
           <Download size={18} />
           <span>Download PDF</span>
