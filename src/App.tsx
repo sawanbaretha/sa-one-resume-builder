@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Navbar } from './components/Navbar';
-import { FormAccordion } from './components/Editor/FormAccordion';
+import { Sidebar } from './components/Sidebar';
+import type { SectionTab } from './components/Sidebar';
+import { Header } from './components/Header';
+import { ScoreBanner } from './components/ScoreBanner';
 import { PersonalDetailsForm } from './components/Editor/PersonalDetailsForm';
 import { ExperienceForm } from './components/Editor/ExperienceForm';
 import { EducationForm } from './components/Editor/EducationForm';
 import { SkillsForm } from './components/Editor/SkillsForm';
 import { ProjectsForm } from './components/Editor/ProjectsForm';
 import { CustomizerForm } from './components/Editor/CustomizerForm';
-import { TemplateSelector } from './components/Preview/TemplateSelector';
+import { TemplateCarousel } from './components/TemplateCarousel';
+import { PreviewToolbar } from './components/Preview/PreviewToolbar';
 import { ResumePreview } from './components/Preview/ResumePreview';
 import { AuthModal } from './components/Auth/AuthModal';
 import { HistoryModal } from './components/History/HistoryModal';
@@ -16,11 +19,13 @@ import { initialResumeData, defaultCustomization } from './data/sampleResume';
 import type { ResumeData, Customization, TemplateId } from './types/resume';
 import { supabase } from './lib/supabase';
 import type { User } from '@supabase/supabase-js';
-import { User as UserIcon, Briefcase, GraduationCap, Award, FolderGit2, Palette, Settings } from 'lucide-react';
+import { Sun } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [customization, setCustomization] = useState<Customization>(defaultCustomization);
+  const [resumeTitle, setResumeTitle] = useState<string>("Software Engineer Resume");
+  const [activeTab, setActiveTab] = useState<SectionTab>('personal');
   const [user, setUser] = useState<User | null>(null);
   
   // Modals state
@@ -54,7 +59,7 @@ export const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch all saved resumes history from Supabase
+  // Fetch saved resume history from Supabase
   const fetchHistory = async (userId: string) => {
     setIsHistoryLoading(true);
     try {
@@ -114,7 +119,7 @@ export const App: React.FC = () => {
     setIsSaving(true);
 
     try {
-      const title = `${resumeData.personalDetails.fullName || 'My'} Resume (${customization.templateId})`;
+      const title = resumeTitle || `${resumeData.personalDetails.fullName || 'My'} Resume`;
       
       const { error } = await supabase
         .from('resumes')
@@ -162,6 +167,7 @@ export const App: React.FC = () => {
   const handleLoadFromHistory = (record: SavedResumeRecord) => {
     if (record.content) setResumeData(record.content);
     if (record.customization) setCustomization(record.customization);
+    if (record.title) setResumeTitle(record.title);
     setIsHistoryOpen(false);
   };
 
@@ -177,7 +183,7 @@ export const App: React.FC = () => {
     executePDFDownloadAndCloudSave(user);
   };
 
-  // Generate PDF, Upload to Supabase Storage Bucket, and Trigger Browser Download
+  // Generate PDF, Upload to Supabase Storage Bucket, and Trigger Download
   const executePDFDownloadAndCloudSave = async (currentUser: User) => {
     const element = previewRef.current;
     if (!element) return;
@@ -231,121 +237,162 @@ export const App: React.FC = () => {
     setHistoryList([]);
   };
 
+  // Tab navigation helpers
+  const tabSequence: SectionTab[] = ['personal', 'experience', 'education', 'skills', 'projects', 'certifications', 'summary', 'customizer'];
+  
+  const handleNextTab = () => {
+    const currentIndex = tabSequence.indexOf(activeTab);
+    if (currentIndex < tabSequence.length - 1) {
+      setActiveTab(tabSequence[currentIndex + 1]);
+    }
+  };
+
   return (
-    <div className="app-container">
-      <Navbar
-        resumeData={resumeData}
-        setResumeData={setResumeData}
+    <div className="app-container-pro">
+      {/* 1. Left Vertical Navigation Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
         user={user}
-        onOpenAuth={() => {
-          setAuthMessage("Sign in or Sign up to access your Supabase saved resumes & history.");
-          setIsAuthOpen(true);
-        }}
-        onSignOut={handleSignOut}
-        onOpenHistory={() => {
-          if (user) fetchHistory(user.id);
-          setIsHistoryOpen(true);
-        }}
-        historyCount={historyList.length}
-        onDownloadPDF={handleDownloadPDF}
+        userName={resumeData.personalDetails.fullName}
       />
 
-      <div className="main-content">
-        {/* Left Form Editor */}
-        <aside className="editor-panel no-print">
-          <div className="editor-header">
-            <h2>
-              <Settings size={20} className="accordion-header-icon" />
-              <span>Resume Content & Design</span>
-            </h2>
-          </div>
+      {/* Main Center & Right Workspace */}
+      <div className="app-workspace">
+        {/* 2. Top Header Bar */}
+        <Header
+          resumeTitle={resumeTitle}
+          onTitleChange={setResumeTitle}
+          user={user}
+          onOpenAuth={() => {
+            setAuthMessage("Sign in or Sign up to access your Supabase saved resumes & history.");
+            setIsAuthOpen(true);
+          }}
+          onSignOut={handleSignOut}
+          onOpenHistory={() => {
+            if (user) fetchHistory(user.id);
+            setIsHistoryOpen(true);
+          }}
+          historyCount={historyList.length}
+        />
 
-          <div className="editor-sections">
-            <FormAccordion
-              title="Personal Details & Summary"
-              icon={<UserIcon size={18} />}
-              defaultOpen={true}
-            >
+        {/* 2 Panel Middle Workspace */}
+        <div className="workspace-panels">
+          {/* Center Form Editor Panel */}
+          <main className="editor-main-panel">
+            {/* Score Progress Banner */}
+            <ScoreBanner />
+
+            {/* Form Section Card */}
+            {activeTab === 'personal' && (
               <PersonalDetailsForm
                 data={resumeData.personalDetails}
                 onChange={(details) => setResumeData({ ...resumeData, personalDetails: details })}
+                onNext={handleNextTab}
               />
-            </FormAccordion>
+            )}
 
-            <FormAccordion
-              title="Work Experience"
-              icon={<Briefcase size={18} />}
-              defaultOpen={true}
-            >
-              <ExperienceForm
-                experiences={resumeData.experiences}
-                onChange={(exps) => setResumeData({ ...resumeData, experiences: exps })}
-              />
-            </FormAccordion>
+            {activeTab === 'experience' && (
+              <div className="card-form-section">
+                <div className="card-form-header">
+                  <h3>Work Experience</h3>
+                  <p>Add your past work experience and achievements.</p>
+                </div>
+                <ExperienceForm
+                  experiences={resumeData.experiences}
+                  onChange={(exps) => setResumeData({ ...resumeData, experiences: exps })}
+                />
+              </div>
+            )}
 
-            <FormAccordion
-              title="Skills & Technologies"
-              icon={<Award size={18} />}
-              defaultOpen={false}
-            >
-              <SkillsForm
-                skills={resumeData.skills}
-                onChange={(sks) => setResumeData({ ...resumeData, skills: sks })}
-              />
-            </FormAccordion>
+            {activeTab === 'education' && (
+              <div className="card-form-section">
+                <div className="card-form-header">
+                  <h3>Education</h3>
+                  <p>Add your degrees and academic qualifications.</p>
+                </div>
+                <EducationForm
+                  educations={resumeData.educations}
+                  onChange={(edus) => setResumeData({ ...resumeData, educations: edus })}
+                />
+              </div>
+            )}
 
-            <FormAccordion
-              title="Projects"
-              icon={<FolderGit2 size={18} />}
-              defaultOpen={false}
-            >
-              <ProjectsForm
-                projects={resumeData.projects}
-                onChange={(projs) => setResumeData({ ...resumeData, projects: projs })}
-              />
-            </FormAccordion>
+            {activeTab === 'skills' && (
+              <div className="card-form-section">
+                <div className="card-form-header">
+                  <h3>Skills & Technologies</h3>
+                  <p>Add your technical skills and proficiency levels.</p>
+                </div>
+                <SkillsForm
+                  skills={resumeData.skills}
+                  onChange={(sks) => setResumeData({ ...resumeData, skills: sks })}
+                />
+              </div>
+            )}
 
-            <FormAccordion
-              title="Education"
-              icon={<GraduationCap size={18} />}
-              defaultOpen={false}
-            >
-              <EducationForm
-                educations={resumeData.educations}
-                onChange={(edus) => setResumeData({ ...resumeData, educations: edus })}
-              />
-            </FormAccordion>
+            {activeTab === 'projects' && (
+              <div className="card-form-section">
+                <div className="card-form-header">
+                  <h3>Projects</h3>
+                  <p>Highlight your key projects and open-source contributions.</p>
+                </div>
+                <ProjectsForm
+                  projects={resumeData.projects}
+                  onChange={(projs) => setResumeData({ ...resumeData, projects: projs })}
+                />
+              </div>
+            )}
 
-            <FormAccordion
-              title="Theme Colors & Fonts"
-              icon={<Palette size={18} />}
-              defaultOpen={false}
-            >
-              <CustomizerForm
-                customization={customization}
-                onChange={setCustomization}
-              />
-            </FormAccordion>
-          </div>
-        </aside>
+            {activeTab === 'customizer' && (
+              <div className="card-form-section">
+                <div className="card-form-header">
+                  <h3>Colors & Fonts Customizer</h3>
+                  <p>Customize the template accent color, font family, and font size.</p>
+                </div>
+                <CustomizerForm
+                  customization={customization}
+                  onChange={setCustomization}
+                />
+              </div>
+            )}
 
-        {/* Right Live Document Preview */}
-        <main className="preview-panel">
-          <div className="preview-toolbar">
-            <TemplateSelector
+            {/* Choose a Template Carousel Grid */}
+            <TemplateCarousel
               activeTemplate={customization.templateId}
-              onSelect={(templateId: TemplateId) =>
+              onSelectTemplate={(templateId: TemplateId) =>
                 setCustomization({ ...customization, templateId })
               }
             />
-          </div>
+          </main>
 
-          <ResumePreview
-            ref={previewRef}
-            data={resumeData}
-            customization={customization}
-          />
-        </main>
+          {/* Right Live Document Preview Panel */}
+          <aside className="preview-main-panel">
+            {/* Live Preview Header */}
+            <div className="preview-top-header no-print">
+              <div className="live-indicator">
+                <span className="live-dot"></span>
+                <span>Live Preview</span>
+              </div>
+              <Sun size={18} color="#64748b" style={{ cursor: 'pointer' }} />
+            </div>
+
+            {/* Document Sheet View */}
+            <div className="preview-sheet-container">
+              <ResumePreview
+                ref={previewRef}
+                data={resumeData}
+                customization={customization}
+              />
+            </div>
+
+            {/* Bottom Action Bar */}
+            <PreviewToolbar
+              onDownload={handleDownloadPDF}
+              onOpenCustomizer={() => setActiveTab('customizer')}
+            />
+          </aside>
+        </div>
       </div>
 
       {/* Supabase Auth Modal */}
