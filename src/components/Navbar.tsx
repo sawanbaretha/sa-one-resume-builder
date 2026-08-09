@@ -63,15 +63,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       <div className="navbar-actions">
         <button
-          className="btn btn-accent btn-sm"
-          onClick={handleLoadSample}
-          title="Fill with sample data"
-        >
-          <Sparkles size={15} />
-          <span>Load Sample</span>
-        </button>
-
-        <button
           className="btn btn-secondary btn-sm"
           onClick={handleReset}
           title="Clear all fields"
