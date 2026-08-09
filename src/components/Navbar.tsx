@@ -1,7 +1,6 @@
 import React from 'react';
-import { Sparkles, Download, RotateCcw, LogIn, LogOut, History as HistoryIcon, Maximize2 } from 'lucide-react';
+import { Download, RotateCcw, LogIn, LogOut, History as HistoryIcon, Maximize2 } from 'lucide-react';
 import type { ResumeData } from '../types/resume';
-import { initialResumeData } from '../data/sampleResume';
 import type { User } from '@supabase/supabase-js';
 import { Logo } from './Logo';
 
@@ -27,9 +26,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenFullScreen,
   onDownloadPDF
 }) => {
-  const handleLoadSample = () => {
-    setResumeData(JSON.parse(JSON.stringify(initialResumeData)));
-  };
 
   const handleReset = () => {
     if (window.confirm("Are you sure you want to reset all fields to empty?")) {
